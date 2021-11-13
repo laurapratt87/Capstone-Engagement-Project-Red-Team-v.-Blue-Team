@@ -1,5 +1,5 @@
 # Capstone-Engagement-Project-Red-Team-v.-Blue-Team
-As the Red Team, attack a vulnerable VM within the environment, ultimately gaining root access to the machine. As Blue Team, use Kibana to review logs taken during Day 1 engagement of Red Team’s attack.. Use the logs to extract hard data and visualizations for a detailed report of findings.
+As the Red Team, attack a vulnerable VM within the environment, ultimately gaining root access to the machine. As Blue Team, use Kibana to review logs taken during Day 1 engagement of Red Team’s attack. Use the logs to extract hard data and visualizations for a detailed report of findings.
 
 This document serves as an outline for the [Presentation](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/Red%20Team%20Powerpoint.pptx) of the Capstone Engagement Project.
 
@@ -14,11 +14,11 @@ The following machines live on the network:
 |ELK | 192.168.1.100   |
 |Azure Hyper-V | 192.168.1.1   |
 
-![alt text](<link to network diagram>)
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/network%20topology1.PNG)
 
 # Red Team
 
-While the web server suffers from several vulnerabilities, here are three that initially discovered:
+While the web server suffers from several vulnerabilities, here are three that were initially discovered:
 
 | | **Vulnerability**     | **Description** | **Impact** |
 |-|----------|------------|------------|
@@ -77,36 +77,37 @@ A considerable amount of data is available in the logs. Specifically, evidence o
 
 **Unusual Request Volume**: Logs indicate an unusual number of requests and failed responses between the Kali VM and the target. Note that 401, 301, 200, 207, and 404 are the top responses.
 
-| HTTP Status Code | Count |
-|----------|------------|
-|   401    |   15,981   |
-|   301    |     2      |
-|   200    |    952     |
-|   207    |     12     |
-|   404    |     6      |
+| HTTP Status Code | Meaning | Count |
+|----------|------------|----------|
+|   401    |  Unauthorized  | 16,067 |
+|   301    |  Moved Permanently | 2 |
+|   200    |    OK     | 536 |
+|   207    | Multi-Status(WebDAV; RFC 4918) | 10 |
+|   404    |  Not Found   | 4 |
 
-Time: 11/09/2021  16:00-19:00 PM
+In addition, note the connection spike in the Connections over time, which indicates the time the spike occurred at 2:46PM (1446 hours).
 
-In addition, note the connection spike in the Connections over time [Packetbeat Flows] ECS, as well as the spike in errors in the Errors vs successful transactions [Packetbeat] ECS
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/time%20attack%20occurred.PNG) 
 
-**Access to Sensitive Data in secret_folder**: On the dashboard you built, a look at your Top 10 HTTP requests [Packetbeat] ECS panel. In this example, this folder was requested 15,987 times.
+This shows the Top Hosts Creating Traffic, which indicates the Kali-Linux Machine have the most traffic at 2:46PM.
 
-![alt text](https://github.com/joshblack07/UR-Cyber-Security-Red_vs_Blue/blob/main/Supplemental%20Resources/dashboard%20w%20shell.PNG "HTTP_Requests")
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/host%20creating%20traffic.PNG)
 
-**HTTP Brute Force Attack**: Searching for url.path: /company_folders/secret_folder/ shows conversations involving the sensitive data. Specifically, the results contain requests from the brute-forcing tool Hydra, identified under the user_agent.original section:
+**Access to Sensitive Data in secret_folder**: On the dashboard, a look at the Top 10 HTTP requests panel shows that the /company_folders/secret_folder was requested 16,071.
 
-![alt text](https://github.com/joshblack07/UR-Cyber-Security-Red_vs_Blue/blob/main/Supplemental%20Resources/hydra%20total.PNG "Hydra")
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/requests%20into%20secret%20directory.PNG)
+
+**HTTP Brute Force Attack**: Searching for `url.path: /company_folders/secret_folder/` shows conversations involving the sensitive data. Specifically, the results contain requests from the brute-forcing tool Hydra, identified under the user_agent.original section.
+
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/brute%20force%20hydra.PNG)
+
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/user%20agent%20hydra%20filter.PNG)
 
 In addition, the logs contain evidence of a large number of requests for the sensitive data, of which only 2 were successful. This is a telltale signature of a brute-force attack. 
 
-  - 15,987 HTTP requests to http://192.168.1.105/company_folders/secrets_folder
-  - 2 successful attempts (Code 301)
-  - 11/09/2021  16:00-19:00 PM
-  - Source IP: 192.168.1.105
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/response%20code%20200%20OK.PNG)
 
-![alt text](https://github.com/joshblack07/UR-Cyber-Security-Red_vs_Blue/blob/main/Supplemental%20Resources/what%20data%20is%20concerning.PNG "HTTP_Requests")
-
-WebDAV Connection & Upload of shell.php: The logs also indicate that an unauthorized actor was able to access protected data in the webdav directory. The passwd.dav file was requested via GET, and shell.php uploaded via POST.
+**WebDAV Connection & Upload of shell.php**: The logs also indicate that an unauthorized actor was able to access protected data in the webdav directory. The passwd.dav file was requested via GET, and shell.php uploaded via POST.
 
 ## Mitigation steps are provided below.
 
