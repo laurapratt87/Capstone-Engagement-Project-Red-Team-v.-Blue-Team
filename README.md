@@ -1,7 +1,7 @@
 # Capstone-Engagement-Project-Red-Team-v.-Blue-Team
 As the Red Team, attack a vulnerable VM within the environment, ultimately gaining root access to the machine. As Blue Team, use Kibana to review logs taken during Day 1 engagement of Red Team’s attack. Use the logs to extract hard data and visualizations for a detailed report of findings.
 
-This document serves as an outline for the [Presentation](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/Red%20Team%20Powerpoint.pptx) of the Capstone Engagement Project.
+This document serves as an outline for the [Presentation]() of the Capstone Engagement Project.
 
 # Network Topology
 
@@ -37,7 +37,7 @@ While the web server suffers from several vulnerabilities, here are three that w
     - Achievements
       - The exploit revealed a `secret_folder` directory
       - Folder says for Asthon’s eyes only, leading the direction of the login efforts. 
-      - This directory is [password protected], but susceptible to **brute-force**
+      - This directory is password protected, but susceptible to **brute-force**.
 
     - Aftermath
       - The login prompt reveals that the user is `Ashton` 
@@ -46,10 +46,10 @@ While the web server suffers from several vulnerabilities, here are three that w
   - **Explotation: Brute Force Vulnerability**
     - Tools & Processes
       - `gunzip` rockyou.gz file to unzip the file to be used later in the password cracking step.
-      - run `hydra -l ashton -P /usr/share/wordlists/rockyou.txt -s 80 -f -vV 192.168.1.105 http-get /company_folders/secret_folder`. Running this command with hydra (built into         the Kali Linux OS) the with the username Ashton, against the rockyou.txt is the process for obtaining Ashton's password. Hydra is a common login cracker.
+      - Run `hydra -l ashton -P /usr/share/wordlists/rockyou.txt -s 80 -f -vV 192.168.1.105 http-get /company_folders/secret_folder`. Running this command with hydra (built into         the Kali Linux OS) with the username Ashton, against the rockyou.txt is the process for obtaining Ashton's password. **Hydra** is a common login cracker.
 
     - Achievements
-      - brute force attack gaining access to log into the browser to gain access to Ryan’s hashed password, which later leads to access to the webdav browser.
+      - Brute force attack gaining access to log into the browser to gain access to Ryan’s hashed password, which later leads to access to the webdav browser.
 
      - Aftermath
        - Crack hash and proceed with brute force attack, logging into the web browser, then receiving further instruction on how to connect to the webdav server, which is used           in the remote code injection.
@@ -60,7 +60,7 @@ While the web server suffers from several vulnerabilities, here are three that w
       - Use shell to explore and compromise target.
  
     - Achievements
-      - Deploring the remote code injection allows up to open the Meterpreter shell into the target. 
+      - Deploying the remote code injection allows up to open the Meterpreter shell into the target. 
       - Once this shell is opened, this opens the door to access the full database. 
 
     - Aftermath
@@ -107,7 +107,9 @@ In addition, the logs contain evidence of a large number of requests for the sen
 
 ![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/response%20code%20200%20OK.PNG)
 
-**WebDAV Connection & Upload of shell.php**: The logs also indicate that an unauthorized actor was able to access protected data in the webdav directory. The passwd.dav file was requested via GET, and shell.php uploaded via POST.
+**WebDAV Connection & Upload of shell.php**: The logs also indicate that an unauthorized actor was able to access protected data in the webdav directory. This image shows that the /webdav/shell.php has a count of 10 with a http status 207, meaning that there are several different responses based on the sub-requests that were made.
+
+![alt text](https://github.com/laurapratt87/Capstone-Engagement-Project-Red-Team-v.-Blue-Team/blob/main/Resources/http%20request%20code%20breakdown.PNG)
 
 ## Mitigation steps are provided below.
 
